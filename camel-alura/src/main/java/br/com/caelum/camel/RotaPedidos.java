@@ -15,10 +15,12 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	from("file:pedidos?delay=5s&noop=true").
-            	marshal(). //queremos transformar a mensagem em outro formato
-                	xmljson(). //de xml para json
-            	log("${exchange.pattern}").
-            	log("${id} - ${body}").
+	            	filter().
+	                	xpath("/pedido/itens/item/formato[text()='EBOOK']").
+	            	marshal(). //queremos transformar a mensagem em outro formato
+	                	xmljson(). //de xml para json
+	            	log("${exchange.pattern}").
+	            	log("${id} - ${body}").
                 to("file:saida");
             	//link documentacao: http://camel.apache.org/file2.html
             }

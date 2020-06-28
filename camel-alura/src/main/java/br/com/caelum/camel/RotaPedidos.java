@@ -21,6 +21,7 @@ public class RotaPedidos {
 	                	xpath("/item/formato[text()='EBOOK']").
 	            	marshal(). //queremos transformar a mensagem em outro formato
 	                	xmljson(). //de xml para json
+	                	setHeader("CamelFileName", simple("${file:name.noext}.json")).
 	            	log("${exchange.pattern}").
 	            	log("${id} - ${body}").
                 to("file:saida");

@@ -15,8 +15,10 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	from("file:pedidos?delay=5s&noop=true").
+            		split().
+                		xpath("/pedido/itens/item").
 	            	filter().
-	                	xpath("/pedido/itens/item/formato[text()='EBOOK']").
+	                	xpath("/item/formato[text()='EBOOK']").
 	            	marshal(). //queremos transformar a mensagem em outro formato
 	                	xmljson(). //de xml para json
 	            	log("${exchange.pattern}").

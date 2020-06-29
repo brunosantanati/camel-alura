@@ -15,10 +15,12 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	from("file:pedidos?delay=5s&noop=true").
-            		split().
+            		/*split().
                 		xpath("/pedido/itens/item").
 	            	filter().
-	                	xpath("/item/formato[text()='EBOOK']").
+	                	xpath("/item/formato[text()='EBOOK']").*/
+            		split(xpath("/pedido/itens/item")).
+                	filter(xpath("/item/formato[text()='EBOOK']")).
 	            	marshal(). //queremos transformar a mensagem em outro formato
 	                	xmljson(). //de xml para json
 	                	setHeader("CamelFileName", simple("${file:name.noext}.json")).
@@ -38,6 +40,8 @@ public class RotaPedidos {
 }
 
 /*
+ * Message Exchange Pattens
+ * 
  * O fluxo pode ser bidirecional sim!
  * No mundo dos padrões de integração (EIP), o exemplo unidirecional é chamado de Event Message ou InOnly. 
  * O exemplo bidirecional é chamado de Request-Reply ou InOut. 
@@ -46,4 +50,13 @@ public class RotaPedidos {
  * 
  * Link com conteúdo do livro "Enterprise Integration Patterns":
  * https://www.enterpriseintegrationpatterns.com/index.html
+ */
+
+/*
+ * Marshal
+ * 
+ * O interessante é que todos os métodos adicionados nas opções desse exercício também existem. 
+ * O método xstream() é responsável por gerar um XML, a partir do objeto Java. 
+ * O método serialization() usa a serialização do Java IO e o método jacksonxml() 
+ * transforma um JSON em um XML (usando a biblioteca de JSON Jackson). 
  */

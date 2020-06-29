@@ -39,6 +39,7 @@ public class EbooItemServlet extends HttpServlet {
 	/*
 	  HTTP GET com os query params para 
 	  http://localhost:8080/webservices/ebook/item
+	  Exemplo chamada GET: http://localhost:8080/webservices/ebook/item?ebookId=ARQ&pedidoId=2451256&clienteId=edgar.b@abc.com
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

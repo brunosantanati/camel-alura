@@ -24,11 +24,11 @@ public class RotaPedidos {
                 	filter(xpath("/item/formato[text()='EBOOK']")).
 	            	marshal(). //queremos transformar a mensagem em outro formato
 	                	xmljson(). //de xml para json
-	                	//setHeader("CamelFileName", simple("${file:name.noext}.json")).
-	                	//setHeader("CamelFileName", simple("${id}.json")).
-	                	setHeader(Exchange.FILE_NAME, simple("${file:name.noext}-${header.CamelSplitIndex}.json")).
 	            	log("${exchange.pattern}").
 	            	log("${id} - ${body}").
+	            	//setHeader("CamelFileName", simple("${file:name.noext}.json")).
+	            	//setHeader("CamelFileName", simple("${id}.json")).
+	            	setHeader(Exchange.FILE_NAME, simple("${file:name.noext}-${header.CamelSplitIndex}.json")).
                 to("file:saida");
             	//link documentacao: http://camel.apache.org/file2.html
             }

@@ -16,12 +16,15 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	from("file:pedidos?delay=5s&noop=true").
+	            	setProperty("pedidoId", xpath("/pedido/id/text()")).
+	                setProperty("clienteId", xpath("/pedido/pagamento/email-titular/text()")).
             		/*split().
                 		xpath("/pedido/itens/item").
 	            	filter().
 	                	xpath("/item/formato[text()='EBOOK']").*/
             		split(xpath("/pedido/itens/item")).
                 	filter(xpath("/item/formato[text()='EBOOK']")).
+                	setProperty("ebookId", xpath("/item/livro/codigo/text()")).
 	            	marshal(). //queremos transformar a mensagem em outro formato
 	                	xmljson(). //de xml para json
 	            	log("${exchange.pattern}").
@@ -30,7 +33,8 @@ public class RotaPedidos {
 	            	//setHeader("CamelFileName", simple("${id}.json")).
 	            	setHeader(Exchange.FILE_NAME, simple("${file:name.noext}-${header.CamelSplitIndex}.json")).
 	            	//setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST)).
-	            	setHeader(Exchange.HTTP_QUERY, constant("clienteId=breno@abc.com&pedidoId=123&ebookId=ARQ")).
+	            	setHeader(Exchange.HTTP_QUERY, 
+	            		simple("clienteId=${property.clienteId}&pedidoId=${property.pedidoId}&ebookId=${property.ebookId}")).
                 to("http4://localhost:8080/webservices/ebook/item");
             	//link documentacao: http://camel.apache.org/file2.html
             }

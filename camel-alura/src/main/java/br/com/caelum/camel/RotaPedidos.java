@@ -29,7 +29,7 @@ public class RotaPedidos {
 	            	//setHeader("CamelFileName", simple("${file:name.noext}.json")).
 	            	//setHeader("CamelFileName", simple("${id}.json")).
 	            	setHeader(Exchange.FILE_NAME, simple("${file:name.noext}-${header.CamelSplitIndex}.json")).
-                to("file:saida");
+                to("http4://localhost:8080/webservices/ebook/item");
             	//link documentacao: http://camel.apache.org/file2.html
             }
             

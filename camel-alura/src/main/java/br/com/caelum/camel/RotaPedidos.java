@@ -1,6 +1,7 @@
 package br.com.caelum.camel;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
@@ -24,7 +25,8 @@ public class RotaPedidos {
 	            	marshal(). //queremos transformar a mensagem em outro formato
 	                	xmljson(). //de xml para json
 	                	//setHeader("CamelFileName", simple("${file:name.noext}.json")).
-	                	setHeader("CamelFileName", simple("${id}.json")).
+	                	//setHeader("CamelFileName", simple("${id}.json")).
+	                	setHeader(Exchange.FILE_NAME, simple("${file:name.noext}-${header.CamelSplitIndex}.json")).
 	            	log("${exchange.pattern}").
 	            	log("${id} - ${body}").
                 to("file:saida");

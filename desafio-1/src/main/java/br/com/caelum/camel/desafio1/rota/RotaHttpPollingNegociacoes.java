@@ -22,7 +22,7 @@ public class RotaHttpPollingNegociacoes {
 
             @Override
             public void configure() throws Exception {
-            	from("timer://negociacoes?fixedRate=true&delay=1s&period=2000").
+            	from("timer://negociacoes?fixedRate=true&delay=1s&period=5s").
 	                to("http4://argentumws-spring.herokuapp.com/negociacoes").
 	                    convertBodyTo(String.class).
 	                    unmarshal(new XStreamDataFormat(xStream)).
@@ -36,7 +36,7 @@ public class RotaHttpPollingNegociacoes {
 		});
 		
 		context.start();
-        Thread.sleep(2000);
+        Thread.sleep(20000);
 		
 	}
 

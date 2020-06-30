@@ -1,54 +1,77 @@
 package br.com.caelum.camel.desafio1.rota;
 
-import org.apache.camel.Main;
+//import java.text.SimpleDateFormat;
+
+import org.apache.camel.CamelContext;
+//import org.apache.camel.Exchange;
+//import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.xstream.XStreamDataFormat;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.SimpleRegistry;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import com.thoughtworks.xstream.XStream;
 
 import br.com.caelum.camel.desafio1.model.Negociacao;
+import br.com.caelum.camel.desafio1.processor.MyProcessor;
 
 public class RotaHttpPollingNegociacoes {
 	
-    private Main main;
+	public static void main(String[] args) throws Exception {
+		
+    	//BD
+    	SimpleRegistry registro = new SimpleRegistry();
+    	registro.put("mysql", criaDataSource());
+    	CamelContext context = new DefaultCamelContext(registro);
+    	
+    	//XML
+		final XStream xStream = new XStream();
+		xStream.alias("negociacao", Negociacao.class);
+		
+		context.addRoutes(new RouteBuilder() {
 
-    public static void main(String[] args) throws Exception {
-    	RotaHttpPollingNegociacoes example = new RotaHttpPollingNegociacoes();
-        example.boot();
+            @Override
+            public void configure() throws Exception {
+            	from("timer://negociacoes?fixedRate=true&delay=1s&period=5s").
+                to("http4://argentumws-spring.herokuapp.com/negociacoes").
+                    convertBodyTo(String.class).
+                    unmarshal(new XStreamDataFormat(xStream)).
+                    split(body()).
+//                    process(new Processor() {
+//                        public void process(Exchange exchange) throws Exception {
+//                            Negociacao negociacao = exchange.getIn().getBody(Negociacao.class);
+//                            exchange.setProperty("preco", negociacao.getPreco());
+//                            exchange.setProperty("quantidade", negociacao.getQuantidade());
+//                            String data = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss").format(negociacao.getData().getTime());
+//                            exchange.setProperty("data", data);
+//                        }
+//                      }).
+                    process(new MyProcessor()).
+                    log("${body}").
+                    setBody(simple("insert into negociacao(preco, quantidade, data) values (${property.preco}, ${property.quantidade}, '${property.data}')")).
+                    log("${body}").
+                    delay(1000).
+                to("jdbc:mysql");
+    	    	//setHeader(Exchange.FILE_NAME, constant("negociacoes.xml")).
+    	        //to("file:saida");
+            }
+            
+		});
+		
+		context.start();
+        Thread.sleep(600000);
+		
+	}
+	
+    private static MysqlConnectionPoolDataSource criaDataSource() {
+        MysqlConnectionPoolDataSource mysqlDs = new MysqlConnectionPoolDataSource();
+        mysqlDs.setDatabaseName("camel");
+        mysqlDs.setServerName("localhost");
+        mysqlDs.setPort(3306);
+        mysqlDs.setUser("root");
+        mysqlDs.setPassword("root1234");
+        return mysqlDs;
     }
-
-    public void boot() throws Exception {
-        // create a Main instance
-        main = new Main();
-        // enable hangup support so you can press ctrl + c to terminate the JVM
-        main.enableHangupSupport();
-        // add routes
-        main.addRouteBuilder(new MyRouteBuilder());
-
-        // run until you terminate the JVM
-        System.out.println("Starting Camel. Use ctrl + c to terminate the JVM.\n");
-        main.run();
-    }
-
-    private static class MyRouteBuilder extends RouteBuilder {
-        @Override
-        public void configure() throws Exception {
-        	
-    		final XStream xStream = new XStream();
-    		xStream.alias("negociacao", Negociacao.class);
-        	
-        	from("timer://negociacoes?fixedRate=true&delay=1s&period=5s").
-            to("http4://argentumws-spring.herokuapp.com/negociacoes").
-                convertBodyTo(String.class).
-                unmarshal(new XStreamDataFormat(xStream)).
-                split(body()).
-                log("${body}").
-            end();
-	    	//setHeader(Exchange.FILE_NAME, constant("negociacoes.xml")).
-	        //to("file:saida");
-        }
-    }
-
-    //documentation: https://people.apache.org/~dkulp/camel/running-camel-standalone-and-have-it-keep-running.html
 
 }

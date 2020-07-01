@@ -16,17 +16,21 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	from("file:pedidos?delay=5s&noop=true").
+            		routeId("rota-pedidos").
+            		multicast().
+            			to("direct:soap").
+		            	to("direct:http");
+            	
+            	from("direct:http").
 	            	setProperty("pedidoId", xpath("/pedido/id/text()")).
 	                setProperty("clienteId", xpath("/pedido/pagamento/email-titular/text()")).
-            		/*split().
+            		split().
                 		xpath("/pedido/itens/item").
 	            	filter().
-	                	xpath("/item/formato[text()='EBOOK']").*/
-            		split(xpath("/pedido/itens/item")).
-                	filter(xpath("/item/formato[text()='EBOOK']")).
+	                	xpath("/item/formato[text()='EBOOK']").
                 	setProperty("ebookId", xpath("/item/livro/codigo/text()")).
-	            	marshal(). //queremos transformar a mensagem em outro formato
-	                	xmljson(). //de xml para json
+	            	marshal().
+	                	xmljson().
 	            	log("${exchange.pattern}").
 	            	log("${id} - ${body}").
 	            	//setHeader("CamelFileName", simple("${file:name.noext}.json")).
@@ -36,7 +40,10 @@ public class RotaPedidos {
 	            	setHeader(Exchange.HTTP_QUERY, 
 	            		simple("clienteId=${property.clienteId}&pedidoId=${property.pedidoId}&ebookId=${property.ebookId}")).
                 to("http4://localhost:8080/webservices/ebook/item");
-            	//link documentacao: http://camel.apache.org/file2.html
+            	
+            	from("direct:soap").
+            		log("chamando servico soap").
+            	to("mock:soap");            	
             }
             
 		});
@@ -47,6 +54,8 @@ public class RotaPedidos {
 
 	}
 }
+
+//link documentacao: http://camel.apache.org/file2.html
 
 /*
  * Message Exchange Pattens

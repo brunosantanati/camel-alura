@@ -22,6 +22,7 @@ public class RotaPedidos {
 		            	to("direct:http");
             	
             	from("direct:http").
+            		routeId("rota-http").
 	            	setProperty("pedidoId", xpath("/pedido/id/text()")).
 	                setProperty("clienteId", xpath("/pedido/pagamento/email-titular/text()")).
             		split().
@@ -42,6 +43,7 @@ public class RotaPedidos {
                 to("http4://localhost:8080/webservices/ebook/item");
             	
             	from("direct:soap").
+            		routeId("rota-soap").
             		log("chamando servico soap").
             	to("mock:soap");            	
             }

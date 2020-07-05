@@ -16,11 +16,14 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	from("file:pedidos?delay=5s&noop=true").
+            		log("${file:name}"). //logando nome do arquivo
             		routeId("rota-pedidos").
-            		multicast().
-            			parallelProcessing().
-	            			to("direct:soap").
-			            	to("direct:http");
+            		delay(1000). //esperando 1 segundo
+            		to("validator:pedido.xsd");//nova validação
+//            		multicast().
+//            			parallelProcessing().
+//	            			to("direct:soap").
+//			            	to("direct:http");
             	
             	from("direct:soap").
                 	routeId("rota-soap").
@@ -55,7 +58,7 @@ public class RotaPedidos {
 		});
 		
 		context.start(); //aqui camel realmente começa a trabalhar
-        Thread.sleep(2000); //esperando um pouco para dar um tempo para camel
+        Thread.sleep(5000); //esperando um pouco para dar um tempo para camel
         context.stop();
 
 	}

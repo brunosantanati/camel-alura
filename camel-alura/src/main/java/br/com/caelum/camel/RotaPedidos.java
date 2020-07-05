@@ -23,8 +23,9 @@ public class RotaPedidos {
            		    		onRedelivery(new Processor() {            
 	           		             @Override
 	           		             public void process(Exchange exchange) throws Exception {
-	           		                 //chamado para cada tentativa
-	           		                 System.out.println("Redelivery");
+	           		            	int counter = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_COUNTER);
+	           		            	int max = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_MAX_COUNTER);
+	           		             	System.out.println("Redelivery - " + counter + "/" + max );
 	           		             }
            		    		})
             	);

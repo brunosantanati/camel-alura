@@ -15,6 +15,8 @@ public class RotaPedidos {
 
             @Override
             public void configure() throws Exception {
+            	errorHandler(
+           		    deadLetterChannel("file:erro"));//mensagem venenosa será gravada na pasta erro
             	from("file:pedidos?delay=5s&noop=true").
             		log("${file:name}"). //logando nome do arquivo
             		routeId("rota-pedidos").

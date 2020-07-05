@@ -18,6 +18,7 @@ public class RotaPedidos {
             public void configure() throws Exception {
             	errorHandler(
            		    deadLetterChannel("file:erro").
+           		    useOriginalMessage(). //guardar mensagem original e nao a mensagem transformada
            		    logExhaustedMessageHistory(true).
            		    maximumRedeliveries(3).
            		    redeliveryDelay(1000).

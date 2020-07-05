@@ -16,7 +16,10 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	errorHandler(
-           		    deadLetterChannel("file:erro"));//mensagem venenosa será gravada na pasta erro
+           		    deadLetterChannel("file:erro").
+           		    	maximumRedeliveries(3).//tente 3 vezes
+           		    		redeliveryDelay(1000) //espera 1 segundo entre as tentativas
+            	);//mensagem venenosa será gravada na pasta erro
             	from("file:pedidos?delay=5s&noop=true").
             		log("${file:name}"). //logando nome do arquivo
             		routeId("rota-pedidos").
@@ -60,7 +63,7 @@ public class RotaPedidos {
 		});
 		
 		context.start(); //aqui camel realmente começa a trabalhar
-        Thread.sleep(5000); //esperando um pouco para dar um tempo para camel
+        Thread.sleep(10000); //esperando um pouco para dar um tempo para camel
         context.stop();
 
 	}

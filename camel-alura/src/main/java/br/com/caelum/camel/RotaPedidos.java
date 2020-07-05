@@ -16,21 +16,35 @@ public class RotaPedidos {
 
             @Override
             public void configure() throws Exception {
-            	errorHandler(
-           		    deadLetterChannel("file:erro").
-           		    useOriginalMessage(). //guardar mensagem original e nao a mensagem transformada
-           		    logExhaustedMessageHistory(true).
-           		    maximumRedeliveries(3).
-           		    redeliveryDelay(1000).
-           		    onRedelivery(new Processor() {            
-						@Override
-						public void process(Exchange exchange) throws Exception {
-							int counter = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_COUNTER);
-							int max = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_MAX_COUNTER);
-							System.out.println("Redelivery - " + counter + "/" + max );
-						}
-           		    })
-            	);
+//            	errorHandler(
+//           		    deadLetterChannel("file:erro").
+//           		    useOriginalMessage(). //guardar mensagem original e nao a mensagem transformada
+//           		    logExhaustedMessageHistory(true).
+//           		    maximumRedeliveries(3).
+//           		    redeliveryDelay(1000).
+//           		    onRedelivery(new Processor() {            
+//						@Override
+//						public void process(Exchange exchange) throws Exception {
+//							int counter = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_COUNTER);
+//							int max = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_MAX_COUNTER);
+//							System.out.println("Redelivery - " + counter + "/" + max );
+//						}
+//           		    })
+//            	);
+            	onException(Exception.class).
+                	handled(true).
+                	to("file:error-parsing").
+                    maximumRedeliveries(3).
+                    redeliveryDelay(4000).
+                    onRedelivery(new Processor() {
+
+                        @Override
+                        public void process(Exchange exchange) throws Exception {
+                                int counter = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_COUNTER);
+                                int max = (int) exchange.getIn().getHeader(Exchange.REDELIVERY_MAX_COUNTER);
+                                System.out.println("Redelivery - " + counter + "/" + max );
+                        }
+                });
             	from("file:pedidos?delay=5s&noop=true").
             		log("${file:name}").
             		routeId("rota-pedidos").
@@ -74,7 +88,7 @@ public class RotaPedidos {
 		});
 		
 		context.start(); //aqui camel realmente começa a trabalhar
-        Thread.sleep(10000); //esperando um pouco para dar um tempo para camel
+        Thread.sleep(60000); //esperando um pouco para dar um tempo para camel
         context.stop();
 
 	}

@@ -2,6 +2,7 @@ package br.com.caelum.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
@@ -17,9 +18,16 @@ public class RotaPedidos {
             public void configure() throws Exception {
             	errorHandler(
            		    deadLetterChannel("file:erro").
-           		    	maximumRedeliveries(3).//tente 3 vezes
-           		    		redeliveryDelay(1000) //espera 1 segundo entre as tentativas
-            	);//mensagem venenosa será gravada na pasta erro
+           		    	maximumRedeliveries(3).
+           		    		redeliveryDelay(1000).
+           		    		onRedelivery(new Processor() {            
+	           		             @Override
+	           		             public void process(Exchange exchange) throws Exception {
+	           		                 //chamado para cada tentativa
+	           		                 System.out.println("Redelivery");
+	           		             }
+           		    		})
+            	);
             	from("file:pedidos?delay=5s&noop=true").
             		log("${file:name}"). //logando nome do arquivo
             		routeId("rota-pedidos").

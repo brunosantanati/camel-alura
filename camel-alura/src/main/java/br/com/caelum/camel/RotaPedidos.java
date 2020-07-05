@@ -31,14 +31,14 @@ public class RotaPedidos {
            		    })
             	);
             	from("file:pedidos?delay=5s&noop=true").
-            		log("${file:name}"). //logando nome do arquivo
+            		log("${file:name}").
             		routeId("rota-pedidos").
-            		delay(1000). //esperando 1 segundo
-            		to("validator:pedido.xsd");//nova validação
-//            		multicast().
-//            			parallelProcessing().
-//	            			to("direct:soap").
-//			            	to("direct:http");
+            		delay(1000).
+            		to("validator:pedido.xsd").
+            		multicast().
+            			parallelProcessing().
+	            			to("direct:soap").
+			            	to("direct:http");
             	
             	from("direct:soap").
                 	routeId("rota-soap").

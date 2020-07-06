@@ -9,9 +9,16 @@ http://activemq.apache.org/components/classic/download/
 
 apache-activemq-5.15.13/bin$ sh activemq console
 
+No Windows:
+activemq.bat console
+ou
+activemq start
+
 3-Acessar o console administrativo:
 
 http://localhost:8161/admin/
+Login: admin
+Senha admin
 
 4-Integração com o Camel:
 

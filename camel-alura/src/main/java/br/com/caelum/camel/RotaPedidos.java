@@ -20,7 +20,8 @@ public class RotaPedidos {
             @Override
             public void configure() throws Exception {
             	errorHandler(
-           		    deadLetterChannel("file:erro").
+           		    //deadLetterChannel("file:erro").
+            		deadLetterChannel("activemq:queue:pedidos.DLQ"). //usando Dead Letter Queue (DLQ)
            		    useOriginalMessage(). //guardar mensagem original e nao a mensagem transformada
            		    logExhaustedMessageHistory(true).
            		    maximumRedeliveries(3).

@@ -22,3 +22,7 @@ http://camel.apache.org/jms.html
 Como o ActiveMQ também é da Apache, foi criado um componente específico para ele:
 
 http://camel.apache.org/activemq.html
+
+5-Link da atividade do curso sobre ActiveMQ:
+
+https://cursos.alura.com.br/course/camel/task/12971

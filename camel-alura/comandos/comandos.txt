@@ -1,0 +1,24 @@
+ACTIVE MQ
+
+1-Link para download do ActiveMQ:
+
+http://activemq.apache.org/download.html
+http://activemq.apache.org/components/classic/download/
+
+2-Para executar, a partir do diretorio bin executar "sh activemq console":
+
+apache-activemq-5.15.13/bin$ sh activemq console
+
+3-Acessar o console administrativo:
+
+http://localhost:8161/admin/
+
+4-Integração com o Camel:
+
+O Camel é integrado muito bem com JMS e ActiveMQ. Se for necessário acessar um broker JMS que não é ActiveMQ, existe um componente JMS:
+
+http://camel.apache.org/jms.html
+
+Como o ActiveMQ também é da Apache, foi criado um componente específico para ele:
+
+http://camel.apache.org/activemq.html
